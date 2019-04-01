@@ -125,7 +125,8 @@ venv.bak/
 /agents
 /los
 /out
+/mvn_project/target
 
 # ignore others
 *.iml
-*.xml
+# *.xml
