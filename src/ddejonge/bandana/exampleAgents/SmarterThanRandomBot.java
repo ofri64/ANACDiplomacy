@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import ddejonge.bandana.negoProtocol.DiplomacyNegoClient;
 import es.csic.iiia.fabregues.dip.Player;
 import es.csic.iiia.fabregues.dip.board.Dislodgement;
 import es.csic.iiia.fabregues.dip.board.GameState;
@@ -291,9 +290,10 @@ public class SmarterThanRandomBot extends Player{
                     }
                 }
             }
+            orders.add(currentOrder);
 
         }
-        return null;
+        return orders;
     }
 
     /**

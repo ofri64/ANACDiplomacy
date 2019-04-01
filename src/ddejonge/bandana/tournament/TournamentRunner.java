@@ -21,7 +21,8 @@ public class TournamentRunner {
 
 	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
-	final static String[] randomBotCommand = {"java", "-jar", "out/artifacts/RandomBot_jar/Bandana Framework 1.3.1.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
+	final static String[] smarterThanRandomBotCommand = {"java", "-jar", "out/artifacts/Bandana_Framework_1_3_1_jar/Bandana Framework 1.3.1.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
+	final static String[] smarterBotMavenBuild = {"java", "-jar", "/Users/okleinfeld/University/BarIlan/diplomacy/mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -118,8 +119,8 @@ public class TournamentRunner {
 					command = randomNegotiatorCommand;
 
 				}else{
-					name = "Random Bot";
-					command = randomBotCommand;
+					name = "SmarterThanRadomBot";
+					command = smarterBotMavenBuild;
 //					name = "DumbBot " + i;
 //					command = dumbBot_1_4_Command;
 				}
