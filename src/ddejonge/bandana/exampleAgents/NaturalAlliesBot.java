@@ -50,7 +50,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
     }
 
     private boolean isFirstRound = true;
-    private List<Power> currentCoallition = new ArrayList<>();
+    private List<Power> currentCoalition = new ArrayList<>();
 
     //Constructor
 
@@ -144,5 +144,40 @@ public class NaturalAlliesBot extends ANACNegotiator{
             }
         }
         return dealsToOffer;
+    }
+
+    private ArrayList<BasicDeal> getCoalitionDmzDealsOffer(ArrayList<Power> aliveCoalitionMembers){
+        // initiate empty list of deals to be filled later
+        ArrayList<BasicDeal> dmzDealsToOffer = new ArrayList<>();
+
+        // make offers for all the coalition members to not attack each other
+        List<DMZ> demilitarizedZones = new ArrayList<>();
+
+
+        for (Power currentMember: aliveCoalitionMembers) {
+
+            // create a list of all other coalition members to participate in the deal
+            ArrayList<Power> allOtherMembers = new ArrayList<>();
+
+            // include our power in the list
+            allOtherMembers.add(me);
+            for (Power potentialMember: aliveCoalitionMembers) {
+
+                // We want to make an offer including all the other coalition members except current one
+                if (potentialMember != currentMember) {
+                    allOtherMembers.add(potentialMember);
+                }
+            }
+
+            // create a DMZ deal containing all alive member committing not to invade the current member SCs
+            demilitarizedZones.add(new DMZ(game.getYear(), game.getPhase(), allOtherMembers, currentMember.getOwnedSCs()));
+            List<OrderCommitment> emptyOrderCommitments = new ArrayList<>();
+            BasicDeal deal = new BasicDeal(emptyOrderCommitments, demilitarizedZones);
+            dmzDealsToOffer.add(deal);
+        }
+
+
+
+        return dmzDealsToOffer;
     }
 }
