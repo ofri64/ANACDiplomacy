@@ -28,7 +28,31 @@
       <groupId>dip_jac</groupId>
       <artifactId>dip_jac</artifactId>
       <version>0.8.1</version>
-    </dependency>    
+    </dependency>
+
+    <dependency>
+      <groupId>bandana</groupId>
+      <artifactId>bandana</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nego_server</groupId>
+      <artifactId>nego_server</artifactId>
+      <version>1.3.1</version>
+    </dependency>   
+
+    <dependency>
+      <groupId>bot</groupId>
+      <artifactId>bot</artifactId>
+      <version>1.6</version>
+    </dependency>       
+
+    <dependency>
+      <groupId>commons_net</groupId>
+      <artifactId>commons_net</artifactId>
+      <version>3.3</version>
+    </dependency>      
 
   </dependencies>
 
@@ -48,7 +72,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>ddejonge.bandana.exampleAgents.SmarterThanRandomBot</mainClass>
+              <mainClass>ddejonge.bandana.exampleAgents.NaturalAlliesBot</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

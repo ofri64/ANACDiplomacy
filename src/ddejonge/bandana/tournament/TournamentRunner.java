@@ -17,12 +17,10 @@ public class TournamentRunner {
 	final static String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
 	final static String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
 	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
-	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
-
+	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1920"};
 	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
-	final static String[] smarterThanRandomBotCommand = {"java", "-jar", "out/artifacts/Bandana_Framework_1_3_1_jar/Bandana Framework 1.3.1.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
-	final static String[] smarterBotMavenBuild = {"java", "-jar", "/Users/okleinfeld/University/BarIlan/diplomacy/mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
+	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "/Users/okleinfeld/University/BarIlan/diplomacy/mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1920"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -31,13 +29,13 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 3;				//The number of games this tournament consists of.
+		int numberOfGames = 5;				//The number of games this tournament consists of.
 		
-		int deadlineForMovePhases = 60; 	//60 seconds for each SPR and FAL phases
+		int deadlineForMovePhases = 30; 	//30 seconds for each SPR and FAL phases
 		int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
 		int deadlineForBuildPhases = 30;  	//30 seconds for each WIN phase
 
-		int finalYear = 1905; 	//The year after which the agents in each game are supposed to propose a draw to each other.
+		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
 		
 		run(numberOfGames, deadlineForMovePhases, deadlineForRetreatPhases, deadlineForBuildPhases, finalYear);
@@ -95,7 +93,7 @@ public class TournamentRunner {
 			System.out.println("GAME " + gameNumber);
 			
 			NegoServerRunner.notifyNewGame(gameNumber);
-			
+
 			//4. Start the players:
 			for(int i=0; i<7; i++){
 
@@ -103,28 +101,20 @@ public class TournamentRunner {
 				String[] command;
 
 				//make sure that each player has a different name.
-				if(i<2){
+				if(i<4) {
+					// 4 copies of natural allies bot
 
-					name = "D-Brane " + i;
-					command = dbrane_1_1_Command;
+					name = "NaturalAlliesBot " + i;
+					command = NaturalAlliesBotCommnad;
+				}
 
-				}else if(i<4){
+				else {
+					// 3 copies of the D-Brane non negotiating bot
 
 					name = "D-BraneExampleBot " + i;
 					command = dbraneExampleBotCommand;
-
-				}else if(i<6){
-
-					name = "RandomNegotiator " + i;
-					command = randomNegotiatorCommand;
-
-				}else{
-					name = "SmarterThanRadomBot";
-					command = smarterBotMavenBuild;
-//					name = "DumbBot " + i;
-//					command = dumbBot_1_4_Command;
 				}
-				
+
 				//set the log folder for this agent to be a subfolder of the tournament log folder.
 				command[4] = tournamentLogFolderPath + File.separator + name + File.separator + "Game " + gameNumber + File.separator; 
 				
