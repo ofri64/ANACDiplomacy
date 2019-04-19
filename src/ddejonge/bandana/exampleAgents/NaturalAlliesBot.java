@@ -35,8 +35,8 @@ public class NaturalAlliesBot extends ANACNegotiator{
 
     }
 
-    String botName;
-    DBraneTactics dBraneTactics;
+    public String botName;
+    protected DBraneTactics dBraneTactics;
     // initialize mapping from each power to its natural allies
     protected static Map<String, List<String>> naturalAllies = new HashMap<>();
     static {
@@ -147,7 +147,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
                     case DiplomacyNegoClient.ACCEPT:
 
                         // log received acceptance and content
-                        this.getLogger().logln("NaturalAlliesBot.negotiate() Received acceptance from " + messageSender + ": " + messageContent, true);
+                        this.getLogger().logln("" + this.botName + ".negotiate() Received acceptance from " + messageSender + ": " + messageContent, true);
 
                         // add sender of message to coalition
                         // add to coalition only in first round
@@ -159,7 +159,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
                     case DiplomacyNegoClient.PROPOSE:
                         BasicDeal deal = (BasicDeal) messageContent.getProposedDeal();
                         // log proposal
-                        this.getLogger().logln("NaturalAlliesBot.negotiate() Received proposal: " + messageContent, true);
+                        this.getLogger().logln("" + this.botName + ".negotiate() Received proposal: " + messageContent, true);
 
                         // check if deal is not outdated and consistent with previous deals
                         if (this.checkProposedDealIsConsistentAndNotOutDated(deal)){
@@ -172,7 +172,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
                     case DiplomacyNegoClient.CONFIRM:
                         // we pretty much do nothing here
                         // just log the confirmation
-                        this.getLogger().logln("NaturalAlliesBot.negotiate() Received confirmed from " + messageSender + ": " + messageContent, true);
+                        this.getLogger().logln( "" + this.botName + ".negotiate() Received confirmed from " + messageSender + ": " + messageContent, true);
                         break;
 
                     case DiplomacyNegoClient.REJECT:
@@ -181,7 +181,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
 
                     default:
                         // received a message of unhandled type - just log the event
-                        this.getLogger().logln("Received a message of unhandled type: " + receivedMessage.getPerformative() + ". Message content: " + messageContent.toString(), true);
+                        this.getLogger().logln("" + this.botName + ".negotiate() Received a message of unhandled type: " + receivedMessage.getPerformative() + ". Message content: " + messageContent.toString(), true);
 
                 }
 
@@ -193,9 +193,12 @@ public class NaturalAlliesBot extends ANACNegotiator{
             } catch (InterruptedException e) {;}
         }
 
+        this.getLogger().logln("" + this.botName + ".negotiate(): end of a negotiation round", true);
+
         // at the end of while loop
         // if it was the first round - update that it is over
         if (this.isFirstRound){
+            this.getLogger().logln("" + this.botName + ".negotiate(): end of FIRST negotiation round", true);
             this.isFirstRound = false;
         }
     }
@@ -213,11 +216,17 @@ public class NaturalAlliesBot extends ANACNegotiator{
     }
 
     protected ArrayList<BasicDeal> getFirstRoundDealsOffer(){
+
+        this.getLogger().logln("" + this.botName + ": First round deals offers. Offering DMZ areas to Natural Allies", true);
+
         // initiate empty list of deals to be filled later
         ArrayList<BasicDeal> dealsToOffer = new ArrayList<>();
 
         // get names of all my natural allies
         List<String> myNaturalAlliesNames = NaturalAlliesBot.naturalAllies.get(this.me.getName());
+
+        this.getLogger().logln("" + this.botName + ": First round deals offers. My power is: " + this.me.getName() + " " +
+                "My natural allies are: " + Arrays.toString(myNaturalAlliesNames.toArray()), true);
 
         // offer to my natural allies a deal that includes joint DMZs
         List<Power> allPowers = this.game.getPowers();
@@ -225,6 +234,8 @@ public class NaturalAlliesBot extends ANACNegotiator{
 
         for(Power power: allPowers) {
             String powerName = power.getName();
+
+            this.getLogger().logln("" + this.botName + ": First round deals offers. Offering DMZ to: " + powerName, true);
 
             if (myNaturalAlliesNames.contains(powerName)) { // only offer to natural allies
                 List<Power> currentAllyForDeal = new ArrayList<>(Arrays.asList(power));
@@ -242,6 +253,8 @@ public class NaturalAlliesBot extends ANACNegotiator{
     }
 
     protected ArrayList<BasicDeal> getCoalitionDmzDealsOffer(List<Power> aliveCoalitionMembers){
+
+        this.getLogger().logln("" + this.botName + ": Advanced round deals offers. Offering DMZ areas to coalition members", true);
         // initiate empty list of deals to be filled later
         ArrayList<BasicDeal> dmzDealsToOffer = new ArrayList<>();
 
@@ -250,6 +263,8 @@ public class NaturalAlliesBot extends ANACNegotiator{
 
 
         for (Power currentMember: aliveCoalitionMembers) {
+
+            this.getLogger().logln("" + this.botName + ": Advanced round deals offers. Offering DMZ areas to the member: " + currentMember.getName(), true);
 
             // create a list of all other coalition members to participate in the deal
             ArrayList<Power> allOtherMembers = new ArrayList<>();
@@ -284,6 +299,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
         }
 
         else{
+            // offer only to current coalition members
             List<Power> aliveCoalitionMembers = this.getAlivePowers(true);
             dealsToOffer = this.getCoalitionDmzDealsOffer(aliveCoalitionMembers);
         }
@@ -314,6 +330,7 @@ public class NaturalAlliesBot extends ANACNegotiator{
 
         // because we have a list of coalition member and not a set we will check if the power exists
         if (!this.currentCoalition.contains(senderPower)){
+            this.getLogger().logln("" + this.botName + ": Adding member to coalition: " + senderPower.getName(), true);
             this.currentCoalition.add(senderPower);
         }
     }
