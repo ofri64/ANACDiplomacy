@@ -130,3 +130,6 @@ venv.bak/
 # ignore others
 *.iml
 # *.xml
+
+# ignore CoallitionBot
+/src/ddejonge/bandana/exampleAgents/CoallitionBot.java

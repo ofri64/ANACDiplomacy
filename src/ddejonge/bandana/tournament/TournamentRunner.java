@@ -14,13 +14,14 @@ public class TournamentRunner {
 	
 	//Command lines to start the various agents provided with the Bandana framework.
 	// Add your own line here to run your own bot.
-	final static String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
-	final static String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
-	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
-	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1905"};
-	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
+//	final static String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
+//	final static String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
+//	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
+	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1920"};
+//	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
-	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1905"};
+	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1920"};
+//	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1905"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -29,13 +30,13 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 15;				//The number of games this tournament consists of.
+		int numberOfGames = 5;				//The number of games this tournament consists of.
 		
 		int deadlineForMovePhases = 30; 	//30 seconds for each SPR and FAL phases
 		int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
 		int deadlineForBuildPhases = 30;  	//30 seconds for each WIN phase
 
-		int finalYear = 1903; 	//The year after which the agents in each game are supposed to propose a draw to each other.
+		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
 		
 		run(numberOfGames, deadlineForMovePhases, deadlineForRetreatPhases, deadlineForBuildPhases, finalYear);
@@ -104,8 +105,8 @@ public class TournamentRunner {
 				if(i<4) {
 					// 4 copies of natural allies bot
 
-					name = "NaturalAlliesBot " + i;
-					command = NaturalAlliesBotCommnad;
+					name = "CoallitionBot " + i;
+					command = CoallitionBotCommand;
 				}
 
 				else {
