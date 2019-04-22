@@ -21,7 +21,7 @@ public class TournamentRunner {
 //	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
 	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1920"};
-//	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1905"};
+	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1920"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -30,13 +30,13 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 5;				//The number of games this tournament consists of.
+		int numberOfGames = 10;				//The number of games this tournament consists of.
 		
 		int deadlineForMovePhases = 30; 	//30 seconds for each SPR and FAL phases
 		int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
 		int deadlineForBuildPhases = 30;  	//30 seconds for each WIN phase
 
-		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
+		int finalYear = 1905; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
 		
 		run(numberOfGames, deadlineForMovePhases, deadlineForRetreatPhases, deadlineForBuildPhases, finalYear);
@@ -105,8 +105,10 @@ public class TournamentRunner {
 				if(i<4) {
 					// 4 copies of natural allies bot
 
-					name = "CoallitionBot " + i;
-					command = CoallitionBotCommand;
+//					name = "CoallitionBot " + i;
+//					command = CoallitionBotCommand;
+					name = "NaturalAlliesBot " + i;
+					command = NaturalAlliesBotCommnad;
 				}
 
 				else {
