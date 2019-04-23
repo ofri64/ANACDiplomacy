@@ -21,7 +21,7 @@ public class TournamentRunner {
 //	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
 	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1905"};
-	final static String[] NaturalAlliesBotCommnad = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBot", "-fy", "1905"};
+	final static String[] NaturalAlliesBotCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBotOldManyOptions", "-fy", "1905"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -30,7 +30,7 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 50;				//The number of games this tournament consists of.
+		int numberOfGames = 20;				//The number of games this tournament consists of.
 		
 		int deadlineForMovePhases = 30; 	//30 seconds for each SPR and FAL phases
 		int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
@@ -108,7 +108,7 @@ public class TournamentRunner {
 //					name = "CoallitionBot " + i;
 //					command = CoallitionBotCommand;
 					name = "NaturalAlliesBot " + i;
-					command = NaturalAlliesBotCommnad;
+					command = NaturalAlliesBotCommand;
 				}
 
 				else {
@@ -179,7 +179,7 @@ public class TournamentRunner {
 		// you can use this list.
 		ArrayList<GameResult> results = tournamentObserver.getGameResults();
 		
-		
+
 		tournamentObserver.exit();
 		ParlanceRunner.stop();
 		NegoServerRunner.stop();
