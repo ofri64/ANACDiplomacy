@@ -1,14 +1,21 @@
 package ddejonge.bandana.exampleAgents;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ddejonge.bandana.anac.ANACNegotiator;
+import ddejonge.bandana.dbraneTactics.DBraneTactics;
+import ddejonge.bandana.dbraneTactics.Plan;
 import ddejonge.bandana.negoProtocol.*;
 import ddejonge.bandana.tools.Utilities;
 import ddejonge.negoServer.Message;
 import es.csic.iiia.fabregues.dip.board.Power;
+import es.csic.iiia.fabregues.dip.board.Region;
+import es.csic.iiia.fabregues.dip.orders.HLDOrder;
 import es.csic.iiia.fabregues.dip.orders.Order;
+import es.csic.iiia.fabregues.dip.orders.SUPOrder;
 
 
 public class NaturalAlliesBot extends ANACNegotiator {
@@ -25,11 +32,12 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
     }
 
+    private int peaceSupplyCenterBoundThreshold = 7;
     private String botName;
     private boolean isFirstPeaceRound = true;
-    private List<Power> coalitionMembers = new ArrayList<>();
     private boolean peaceToAllMode = true;
-    private static int peaceSupplyCenterBoundThreshold = 7;
+    private List<Power> coalitionMembers = new ArrayList<>();
+    private DBraneTactics dBraneTactics;
 
     //Constructor
 
@@ -42,6 +50,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
     public NaturalAlliesBot(String[] args) {
         super(args);
         botName = "NaturalAlliesBot";
+        dBraneTactics = this.getTacticalModule();
 
     }
 
@@ -88,12 +97,12 @@ public class NaturalAlliesBot extends ANACNegotiator {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
-        if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode){
+        if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
             this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stub mode", true);
             peaceToAllMode = false;
         }
 
-        if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode){
+        if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
             this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
             peaceToAllMode = true;
             isFirstPeaceRound = true;
@@ -126,7 +135,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
                     }
 
                 } else if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.PROPOSE)) {
-                    if (peaceToAllMode){ // only accept proposals in peach to all mode
+                    if (peaceToAllMode) { // only accept proposals in peach to all mode
                         DiplomacyProposal receivedProposal = (DiplomacyProposal) receivedMessage.getContent();
                         BasicDeal deal = (BasicDeal) receivedProposal.getProposedDeal();
 
@@ -164,7 +173,9 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
             try {
                 Thread.sleep(250);
-            } catch (InterruptedException e) {;}
+            } catch (InterruptedException e) {
+                ;
+            }
 
         }
 
@@ -172,21 +183,40 @@ public class NaturalAlliesBot extends ANACNegotiator {
     }
 
     private List<BasicDeal> getDealsToOffer() {
-        List<BasicDeal> dealsToOffer;
+        List<BasicDeal> dealsToOffer = new ArrayList<>();
+        List<BasicDeal> dmzDealsToOffer = new ArrayList<>();
+        List<BasicDeal> supportHoldDealsToOffer = new ArrayList<>();
+
 
         if (isFirstPeaceRound) {
             List<Power> allPowers = game.getPowers();
-            dealsToOffer = getDmzDealsSingleAlly(allPowers);
+            dmzDealsToOffer = getDmzDealsSingleAlly(allPowers);
 
         } else {
 
             List<Power> aliveAllies = getAliveCoalitionMembers();
 
             if (aliveAllies.size() == 1) {
-                dealsToOffer = getDmzDealsSingleAlly(aliveAllies);
+                dmzDealsToOffer = getDmzDealsSingleAlly(aliveAllies);
+
             } else {
-                dealsToOffer = getDmzDealsMultipleAllies(aliveAllies);
+
+                dmzDealsToOffer = getDmzDealsMultipleAllies(aliveAllies);
             }
+
+            // use D-Brane tactics module to get a plan of good orders subjected to current commitments
+            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals());
+            List<Order> planOrders = tacticPlan.getMyOrders();
+            supportHoldDealsToOffer = this.getDealsToSupportHoldOrder(planOrders);
+
+        }
+
+        if (dmzDealsToOffer.size() > 0){
+            dealsToOffer.addAll(dmzDealsToOffer);
+        }
+
+        if (supportHoldDealsToOffer.size() > 0){
+            dealsToOffer.addAll(supportHoldDealsToOffer);
         }
 
         return dealsToOffer;
@@ -241,6 +271,68 @@ public class NaturalAlliesBot extends ANACNegotiator {
         return dealsToOffer;
     }
 
+    private List<BasicDeal> getDealsToSupportHoldOrder(List<Order> planOrders) {
+        List<BasicDeal> dealsToOffer = new ArrayList<>();
+        // use a mapping from every ally to its controlled regions
+        List<Power> aliveAllies = getAliveCoalitionMembers();
+        Map<String, List<Region>> alliesRegions = this.getPowersControlledRegions(aliveAllies);
+
+        // get order from plan and check which type of orders are advised by tactics module
+        for (Order order : planOrders) {
+
+            if (order instanceof HLDOrder) {
+                HLDOrder holdOrder = (HLDOrder) order;
+                this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + holdOrder.getLocation(), true);
+                List<BasicDeal> dealsToAdd = this.addDealsSupportHoldOrders(holdOrder, alliesRegions);
+                dealsToOffer.addAll(dealsToAdd);
+            }
+        }
+
+        return dealsToOffer;
+    }
+
+    private List<BasicDeal> addDealsSupportHoldOrders(HLDOrder holdOrder, Map<String, List<Region>> alliesRegions){
+        List<BasicDeal> dealsToAdd = new ArrayList<>();
+        Region holdUnit =  holdOrder.getLocation();
+        List<Region> adjacentRegions = holdUnit.getAdjacentRegions();
+
+        // iterate over adjacent regions
+        // try to find a region controlled by one of our allies
+        // offer him to support our hold order
+
+        for (Region adjacentRegion: adjacentRegions) {
+            for (String allyName : alliesRegions.keySet()) {
+                if (alliesRegions.get(allyName).contains(adjacentRegion)) {
+
+                    this.getLogger().logln(botName + ": Support Hold Order: Found an ally " + allyName + " with an adjacent unit " + adjacentRegion.getName()
+                            + " offering mutual hold deal", true);
+
+                    // create order commitment
+                    Power allyPower = this.game.getPower(allyName);
+                    Order supportMyHoldOrder = new SUPOrder(allyPower, adjacentRegion, holdOrder);
+                    OrderCommitment allySupportOrderCommitment = new OrderCommitment(game.getYear(), game.getPhase(), supportMyHoldOrder);
+
+                    // deals cannot contain only one power so add a commitment to support an hold of ally power in current region
+                    HLDOrder allyHoldOrder = new HLDOrder(allyPower, adjacentRegion);
+                    Order supportAllyHoldOrder = new SUPOrder(this.me, holdUnit, allyHoldOrder);
+                    OrderCommitment mySupportOrderCommitment = new OrderCommitment(game.getYear(), game.getPhase(), supportAllyHoldOrder);
+
+                    // create a deal
+                    List<OrderCommitment> Commitments = new ArrayList<>();
+                    Commitments.add(allySupportOrderCommitment);
+                    Commitments.add(mySupportOrderCommitment);
+
+                    List<DMZ> emptyDmzList = new ArrayList<>();
+                    BasicDeal deal = new BasicDeal(Commitments, emptyDmzList);
+
+                    // add deal to list of support hold deals
+                    dealsToAdd.add(deal);
+                }
+            }
+        }
+        return dealsToAdd;
+    }
+
     private void addToCoalition(Power power) {
         if (!coalitionMembers.contains(power)) {
             coalitionMembers.add(power);
@@ -261,7 +353,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
         return aliveCoalitionMembers;
     }
 
-    protected boolean checkProposedDealIsConsistentAndNotOutDated(BasicDeal proposedDeal) {
+    private boolean checkProposedDealIsConsistentAndNotOutDated(BasicDeal proposedDeal) {
         // check DMZ offers are not outdated
         for (DMZ dmz : proposedDeal.getDemilitarizedZones()) {
 
@@ -296,5 +388,25 @@ public class NaturalAlliesBot extends ANACNegotiator {
         // the consistency report returns null for consistent deals
 
         return consistencyReport == null;
+    }
+
+    private Map<String, List<Region>> getPowersControlledRegions() {
+        Map<String, List<Region>> powersControlledRegions = new HashMap<>();
+        for (Power ally : this.game.getPowers()) {
+            String allyName = ally.getName();
+            List<Region> allyRegions = ally.getControlledRegions();
+            powersControlledRegions.put(allyName, allyRegions);
+        }
+        return powersControlledRegions;
+    }
+
+    private Map<String, List<Region>> getPowersControlledRegions(List<Power> powers) {
+        Map<String, List<Region>> powersControlledRegions = new HashMap<>();
+        for (Power ally : powers) {
+            String allyName = ally.getName();
+            List<Region> allyRegions = ally.getControlledRegions();
+            powersControlledRegions.put(allyName, allyRegions);
+        }
+        return powersControlledRegions;
     }
 }
