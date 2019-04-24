@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ddejonge.bandana.anac.ANACNegotiator;
-import ddejonge.bandana.dbraneTactics.DBraneTactics;
 import ddejonge.bandana.negoProtocol.*;
 import ddejonge.bandana.tools.Utilities;
 import ddejonge.negoServer.Message;
@@ -27,9 +26,10 @@ public class NaturalAlliesBot extends ANACNegotiator {
     }
 
     private String botName;
-    private boolean isFirstRound = true;
+    private boolean isFirstPeaceRound = true;
     private List<Power> coalitionMembers = new ArrayList<>();
-    private DBraneTactics dBraneTactics;
+    private boolean peaceToAllMode = true;
+    private static int peaceSupplyCenterBoundThreshold = 7;
 
     //Constructor
 
@@ -41,8 +41,6 @@ public class NaturalAlliesBot extends ANACNegotiator {
      */
     public NaturalAlliesBot(String[] args) {
         super(args);
-
-        dBraneTactics = this.getTacticalModule();
         botName = "NaturalAlliesBot";
 
     }
@@ -88,7 +86,19 @@ public class NaturalAlliesBot extends ANACNegotiator {
     @Override
     public void negotiate(long negotiationDeadline) {
         boolean startOfThisNegotiation = true;
-        List<Power> aliveAllies = getAliveCoalitionMembers();
+        int mySupplyCenterNumber = this.me.getOwnedSCs().size();
+
+        if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode){
+            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stub mode", true);
+            peaceToAllMode = false;
+        }
+
+        if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode){
+            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
+            peaceToAllMode = true;
+            isFirstPeaceRound = true;
+            coalitionMembers = new ArrayList<>();
+        }
 
         //This loop repeats 2 steps. The first step is to handle any incoming messages,
         // while the second step tries to find deals to propose to the other negotiators.
@@ -107,7 +117,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
                     this.getLogger().logln("" + botName + ".negotiate() Received acceptance from " + receivedMessage.getSender() + ": " + acceptedProposal, false);
 
                     // This is to make sure this happens only in the first time.
-                    if (isFirstRound) {
+                    if (isFirstPeaceRound && peaceToAllMode) {
                         List<String> dealParticipants = new ArrayList<>();
                         dealParticipants.add(receivedMessage.getSender());
                         for (String powerName : dealParticipants) {
@@ -116,11 +126,13 @@ public class NaturalAlliesBot extends ANACNegotiator {
                     }
 
                 } else if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.PROPOSE)) {
-                    DiplomacyProposal receivedProposal = (DiplomacyProposal) receivedMessage.getContent();
-                    BasicDeal deal = (BasicDeal) receivedProposal.getProposedDeal();
+                    if (peaceToAllMode){ // only accept proposals in peach to all mode
+                        DiplomacyProposal receivedProposal = (DiplomacyProposal) receivedMessage.getContent();
+                        BasicDeal deal = (BasicDeal) receivedProposal.getProposedDeal();
 
-                    if (checkProposedDealIsConsistentAndNotOutDated(deal)) {
-                        this.acceptProposal(receivedProposal.getId());
+                        if (checkProposedDealIsConsistentAndNotOutDated(deal)) {
+                            this.acceptProposal(receivedProposal.getId());
+                        }
                     }
 
                 } else if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.CONFIRM)) {
@@ -136,8 +148,10 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
             }
 
-            //STEP 2:  offer deals.
-            if (startOfThisNegotiation) {
+            //STEP 2: offer deals.
+            // only offer deals in peace to all mode
+            if (startOfThisNegotiation && peaceToAllMode) {
+                this.getLogger().logln(botName + ": " + me.getName() + " now offering deals.", true);
 
                 List<BasicDeal> dealsToOffer = getDealsToOffer();
                 for (BasicDeal deal : dealsToOffer) {
@@ -154,19 +168,19 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
         }
 
-        isFirstRound = false;
+        isFirstPeaceRound = false;
     }
 
     private List<BasicDeal> getDealsToOffer() {
-        List<BasicDeal> dealsToOffer = new ArrayList<>();
+        List<BasicDeal> dealsToOffer;
 
-        if (isFirstRound) {
+        if (isFirstPeaceRound) {
             List<Power> allPowers = game.getPowers();
             dealsToOffer = getDmzDealsSingleAlly(allPowers);
+
         } else {
 
             List<Power> aliveAllies = getAliveCoalitionMembers();
-            this.getLogger().logln("size of coalition not including myself" + aliveAllies.size(), false);
 
             if (aliveAllies.size() == 1) {
                 dealsToOffer = getDmzDealsSingleAlly(aliveAllies);
