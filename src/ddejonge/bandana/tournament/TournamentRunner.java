@@ -21,7 +21,7 @@ public class TournamentRunner {
 //	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1905"};
 
 	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1915"};
-	final static String[] NaturalAlliesBotCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBotOldManyOptions", "-fy", "1915"};
+	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "NaturalAlliesBotOldManyOptions", "-fy", "1915"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -107,8 +107,8 @@ public class TournamentRunner {
 
 //					name = "CoallitionBot " + i;
 //					command = CoallitionBotCommand;
-					name = "NaturalAlliesBot " + i;
-					command = NaturalAlliesBotCommand;
+					name = "BackStabDiplomat " + i;
+					command = BackStabDiplomatCommand;
 				}
 
 				else {

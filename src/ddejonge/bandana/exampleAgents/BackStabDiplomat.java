@@ -16,7 +16,7 @@ import es.csic.iiia.fabregues.dip.board.Region;
 import es.csic.iiia.fabregues.dip.orders.*;
 
 
-public class NaturalAlliesBot extends ANACNegotiator {
+public class BackStabDiplomat extends ANACNegotiator {
     /**
      * Main method to start the agent
      *
@@ -25,7 +25,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
     public static void main(String[] args) {
 
-        NaturalAlliesBot myPlayer = new NaturalAlliesBot(args);
+        BackStabDiplomat myPlayer = new BackStabDiplomat(args);
         myPlayer.run();
 
     }
@@ -45,9 +45,9 @@ public class NaturalAlliesBot extends ANACNegotiator {
      *
      * @param args
      */
-    public NaturalAlliesBot(String[] args) {
+    public BackStabDiplomat(String[] args) {
         super(args);
-        botName = "NaturalAlliesBot";
+        botName = "BackStabDiplomat";
         dBraneTactics = this.getTacticalModule();
 
     }
@@ -96,7 +96,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
         if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
-            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stub mode", true);
+            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
             peaceToAllMode = false;
         }
 
@@ -182,7 +182,7 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
     private List<BasicDeal> getDealsToOffer() {
         List<BasicDeal> dealsToOffer = new ArrayList<>();
-        List<BasicDeal> dmzDealsToOffer = new ArrayList<>();
+        List<BasicDeal> dmzDealsToOffer;
         List<BasicDeal> supportHoldAndMoveDealsToOffer = new ArrayList<>();
 
 
@@ -222,10 +222,10 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
     private List<BasicDeal> getDmzDealsSingleAlly(List<Power> alliesPowers) {
         List<BasicDeal> dealsToOffer = new ArrayList<>();
+        List<DMZ> demilitarizedZones = new ArrayList<>();
 
         // offer mutual DMZ deals for each ally
         for (Power power : alliesPowers) {
-            List<DMZ> demilitarizedZones = new ArrayList<>();
             if (power != this.me) {
 
                 List<Power> currentAllyList = new ArrayList<>();
@@ -247,10 +247,10 @@ public class NaturalAlliesBot extends ANACNegotiator {
 
     private List<BasicDeal> getDmzDealsMultipleAllies(List<Power> aliveAllies) {
         List<BasicDeal> dealsToOffer = new ArrayList<>();
+        List<DMZ> demilitarizedZones = new ArrayList<>();
 
         // make offers for all the coalition members to not attack each other
         for (Power ally : aliveAllies) {
-            List<DMZ> demilitarizedZones = new ArrayList<>();
             List<Power> otherCoalitionMembers = new ArrayList<>();
             otherCoalitionMembers.add(me);
 
@@ -442,16 +442,6 @@ public class NaturalAlliesBot extends ANACNegotiator {
         // the consistency report returns null for consistent deals
 
         return consistencyReport == null;
-    }
-
-    private Map<String, List<Region>> getPowersControlledRegions() {
-        Map<String, List<Region>> powersControlledRegions = new HashMap<>();
-        for (Power ally : this.game.getPowers()) {
-            String allyName = ally.getName();
-            List<Region> allyRegions = ally.getControlledRegions();
-            powersControlledRegions.put(allyName, allyRegions);
-        }
-        return powersControlledRegions;
     }
 
     private Map<String, List<Region>> getPowersControlledRegions(List<Power> powers) {
