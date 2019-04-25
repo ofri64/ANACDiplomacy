@@ -72,7 +72,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>ddejonge.bandana.exampleAgents.NaturalAlliesBot</mainClass>
+              <mainClass>ddejonge.bandana.exampleAgents.BackStabDiplomat</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
