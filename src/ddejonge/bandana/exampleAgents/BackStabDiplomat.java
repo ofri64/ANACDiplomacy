@@ -30,7 +30,7 @@ public class BackStabDiplomat extends ANACNegotiator {
 
     }
 
-    private int peaceSupplyCenterBoundThreshold = 7;
+    private int peaceSupplyCenterBoundThreshold = 6;
     private String botName;
     private boolean isFirstPeaceRound = true;
     private boolean peaceToAllMode = true;
@@ -95,16 +95,19 @@ public class BackStabDiplomat extends ANACNegotiator {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
-        if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
-            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
-            peaceToAllMode = false;
-        }
+        if (game.getYear() >= 1910) {
 
-        if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
-            this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
-            peaceToAllMode = true;
-            isFirstPeaceRound = true;
-            coalitionMembers = new ArrayList<>();
+            if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
+                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
+                peaceToAllMode = false;
+            }
+
+            if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
+                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
+                peaceToAllMode = true;
+                isFirstPeaceRound = true;
+                coalitionMembers = new ArrayList<>();
+            }
         }
 
         //This loop repeats 2 steps. The first step is to handle any incoming messages,
@@ -158,7 +161,7 @@ public class BackStabDiplomat extends ANACNegotiator {
             //STEP 2: offer deals.
             // only offer deals in peace to all mode
             if (startOfThisNegotiation && peaceToAllMode) {
-                this.getLogger().logln(botName + ": " + me.getName() + " now offering deals.", true);
+                this.getLogger().logln(botName + ": " + me.getName() + " now offering deals.", false);
 
                 List<BasicDeal> dealsToOffer = getDealsToOffer();
                 for (BasicDeal deal : dealsToOffer) {
@@ -280,7 +283,7 @@ public class BackStabDiplomat extends ANACNegotiator {
 
             if (order instanceof HLDOrder) {
                 HLDOrder holdOrder = (HLDOrder) order;
-                this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + holdOrder.getLocation(), true);
+                this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + holdOrder.getLocation(), false);
                 List<BasicDeal> dealsToAdd = this.addDealsSupportHoldOrders(holdOrder, alliesRegions);
                 dealsToOffer.addAll(dealsToAdd);
             }
@@ -288,7 +291,7 @@ public class BackStabDiplomat extends ANACNegotiator {
             else if (order instanceof MTOOrder){
                 MTOOrder moveOrder = (MTOOrder) order;
                 this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + moveOrder.getLocation() + " to: " +
-                        moveOrder.getDestination(), true);
+                        moveOrder.getDestination(), false);
                 List<BasicDeal> dealsToAdd = this.addDealsSupportMoveOrders(moveOrder, alliesRegions);
                 dealsToOffer.addAll(dealsToAdd);
             }
@@ -311,7 +314,7 @@ public class BackStabDiplomat extends ANACNegotiator {
                 if (alliesRegions.get(allyName).contains(adjacentRegion)) {
 
                     this.getLogger().logln(botName + ": Support Hold Order: Found an ally " + allyName + " with an adjacent unit " + adjacentRegion.getName()
-                            + " offering mutual hold deal", true);
+                            + " offering mutual hold deal", false);
 
                     // create order commitment
                     Power allyPower = this.game.getPower(allyName);
@@ -355,7 +358,7 @@ public class BackStabDiplomat extends ANACNegotiator {
                 if (alliesRegions.get(allyName).contains(adjacentRegion)) {
 
                     this.getLogger().logln(botName + ": Support Move Order: Found an ally " + allyName + " with an adjacent unit " + adjacentRegion.getName()
-                            + " offering mutual hold deal", true);
+                            + " offering mutual hold deal", false);
 
                     // create order commitment
                     Power allyPower = this.game.getPower(allyName);
