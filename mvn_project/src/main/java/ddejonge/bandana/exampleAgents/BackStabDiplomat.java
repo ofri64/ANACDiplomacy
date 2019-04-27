@@ -95,7 +95,7 @@ public class BackStabDiplomat extends ANACNegotiator {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
-        if (game.getYear() >= 1910) {
+        if (game.getYear() >= 1908) {
 
             if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
                 this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
@@ -288,13 +288,13 @@ public class BackStabDiplomat extends ANACNegotiator {
                 dealsToOffer.addAll(dealsToAdd);
             }
 
-            else if (order instanceof MTOOrder){
-                MTOOrder moveOrder = (MTOOrder) order;
-                this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + moveOrder.getLocation() + " to: " +
-                        moveOrder.getDestination(), false);
-                List<BasicDeal> dealsToAdd = this.addDealsSupportMoveOrders(moveOrder, alliesRegions);
-                dealsToOffer.addAll(dealsToAdd);
-            }
+//            else if (order instanceof MTOOrder){
+//                MTOOrder moveOrder = (MTOOrder) order;
+//                this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + moveOrder.getLocation() + " to: " +
+//                        moveOrder.getDestination(), false);
+//                List<BasicDeal> dealsToAdd = this.addDealsSupportMoveOrders(moveOrder, alliesRegions);
+//                dealsToOffer.addAll(dealsToAdd);
+//            }
         }
 
         return dealsToOffer;

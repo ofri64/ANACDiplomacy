@@ -30,11 +30,11 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 20;				//The number of games this tournament consists of.
+		int numberOfGames = 40;				//The number of games this tournament consists of.
 		
-		int deadlineForMovePhases = 30; 	//30 seconds for each SPR and FAL phases
-		int deadlineForRetreatPhases = 30;  //30 seconds for each SUM and AUT phases
-		int deadlineForBuildPhases = 30;  	//30 seconds for each WIN phase
+		int deadlineForMovePhases = 10; 	//30 seconds for each SPR and FAL phases
+		int deadlineForRetreatPhases = 10;  //30 seconds for each SUM and AUT phases
+		int deadlineForBuildPhases = 10;  	//30 seconds for each WIN phase
 
 		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
@@ -102,15 +102,15 @@ public class TournamentRunner {
 				String[] command;
 
 				//make sure that each player has a different name.
-				if(i<3) {
+				if(i<2) {
 					// 4 copies of natural allies bot
 
 //					name = "CoallitionBot " + i;
 //					command = CoallitionBotCommand;
-//					name = "BackStabDiplomat " + i;
-//					command = BackStabDiplomatCommand;
-					name = "D-BraneExampleBot " + i;
-					command = dbraneExampleBotCommand;
+					name = "BackStabDiplomat " + i;
+					command = BackStabDiplomatCommand;
+//					name = "D-BraneExampleBot " + i;
+//					command = dbraneExampleBotCommand;
 				}
 
 				else if (i < 5) {
@@ -123,10 +123,10 @@ public class TournamentRunner {
 
 //					name = "CoallitionBot " + i;
 //					command = CoallitionBotCommand;
-					name = "BackStabDiplomat " + i;
-					command = BackStabDiplomatCommand;
-//					name = "D-BraneExampleBot " + i;
-//					command = dbraneExampleBotCommand;
+//					name = "BackStabDiplomat " + i;
+//					command = BackStabDiplomatCommand;
+					name = "D-BraneExampleBot " + i;
+					command = dbraneExampleBotCommand;
 				}
 
 				//set the log folder for this agent to be a subfolder of the tournament log folder.
