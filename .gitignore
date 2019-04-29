@@ -127,6 +127,7 @@ venv.bak/
 /out
 /mvn_project/target
 !/agents/BackStabDiplomat.jar
+!/agents/CoallitionBot.jar
 
 # ignore others
 *.iml
