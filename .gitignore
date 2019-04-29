@@ -122,10 +122,11 @@ venv.bak/
 
 # igone agnet, lib out and log folders
 /lib
-/agents
+/agents/*
 /los
 /out
 /mvn_project/target
+!/agents/BackStabDiplomat.jar
 
 # ignore others
 *.iml
