@@ -30,7 +30,8 @@ public class BackStabDiplomat extends ANACNegotiator {
 
     }
 
-    private int peaceSupplyCenterBoundThreshold = 6;
+    private int backStabSupplyCenterLowerBoundThreshold = 7;
+    private int undoBackStabSupplyCenterUpperBoundThreshold = 4;
     private String botName;
     private boolean isFirstPeaceRound = true;
     private boolean peaceToAllMode = true;
@@ -94,21 +95,21 @@ public class BackStabDiplomat extends ANACNegotiator {
     public void negotiate(long negotiationDeadline) {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
+        int currentYear = game.getYear();
+        int strongestPowerNumSc = this.getNumSupplyCentersForStrongestPowerBesidesMe();
 
-//        if (game.getYear() >= 1908) {
-//
-//            if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
-//                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
-//                peaceToAllMode = false;
-//            }
-//
-//            if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
-//                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
-//                peaceToAllMode = true;
-//                isFirstPeaceRound = true;
-//                coalitionMembers = new ArrayList<>();
-//            }
-//        }
+
+            if (mySupplyCenterNumber >= backStabSupplyCenterLowerBoundThreshold && peaceToAllMode && currentYear >= 1915 && strongestPowerNumSc < 14) {
+                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
+                peaceToAllMode = false;
+            }
+
+            if (mySupplyCenterNumber <= undoBackStabSupplyCenterUpperBoundThreshold && !peaceToAllMode) {
+                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
+                peaceToAllMode = true;
+                isFirstPeaceRound = true;
+                coalitionMembers = new ArrayList<>();
+            }
 
         //This loop repeats 2 steps. The first step is to handle any incoming messages,
         // while the second step tries to find deals to propose to the other negotiators.
@@ -456,5 +457,19 @@ public class BackStabDiplomat extends ANACNegotiator {
             powersControlledRegions.put(allyName, allyRegions);
         }
         return powersControlledRegions;
+    }
+
+    private int getNumSupplyCentersForStrongestPowerBesidesMe(){
+        int maxSupplyCenters = 0;
+        List<Power> allPowers = this.game.getPowers();
+        for (Power power : allPowers){
+            if (power != me){
+                int powerNumSupplyCenters = power.getOwnedSCs().size();
+                if (powerNumSupplyCenters > maxSupplyCenters){
+                    maxSupplyCenters = powerNumSupplyCenters;
+                }
+            }
+        }
+        return maxSupplyCenters;
     }
 }
