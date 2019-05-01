@@ -195,6 +195,8 @@ public class BackStabDiplomat extends ANACNegotiator {
             List<Power> allPowers = game.getPowers();
             dmzDealsToOffer = getDmzDealsSingleAlly(allPowers);
 
+        }
+
 //        } else {
 //
 //
@@ -206,18 +208,17 @@ public class BackStabDiplomat extends ANACNegotiator {
 //                dmzDealsToOffer = getDmzDealsMultipleAllies(aliveAllies);
 //            }
 
-            // use D-Brane tactics module to get a plan of good orders subjected to current commitments
-            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
-            List<Order> planOrders = tacticPlan.getMyOrders();
-            supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
+        // use D-Brane tactics module to get a plan of good orders subjected to current commitments
+        Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
+        List<Order> planOrders = tacticPlan.getMyOrders();
+        supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
 
-        }
 
-        if (dmzDealsToOffer.size() > 0){
+        if (dmzDealsToOffer.size() > 0) {
             dealsToOffer.addAll(dmzDealsToOffer);
         }
 
-        if (supportHoldAndMoveDealsToOffer.size() > 0){
+        if (supportHoldAndMoveDealsToOffer.size() > 0) {
             dealsToOffer.addAll(supportHoldAndMoveDealsToOffer);
         }
 
@@ -287,9 +288,7 @@ public class BackStabDiplomat extends ANACNegotiator {
                 this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + holdOrder.getLocation(), false);
                 List<BasicDeal> dealsToAdd = this.addDealsSupportHoldOrders(holdOrder, alliesRegions);
                 dealsToOffer.addAll(dealsToAdd);
-            }
-
-            else if (order instanceof MTOOrder){
+            } else if (order instanceof MTOOrder) {
                 MTOOrder moveOrder = (MTOOrder) order;
                 this.getLogger().logln("" + this.botName + ": D-Brain advices Hold Order: " + moveOrder.getLocation() + " to: " +
                         moveOrder.getDestination(), false);
@@ -302,16 +301,16 @@ public class BackStabDiplomat extends ANACNegotiator {
         return dealsToOffer;
     }
 
-    private List<BasicDeal> addDealsSupportHoldOrders(HLDOrder holdOrder, Map<String, List<Region>> alliesRegions){
+    private List<BasicDeal> addDealsSupportHoldOrders(HLDOrder holdOrder, Map<String, List<Region>> alliesRegions) {
         List<BasicDeal> dealsToAdd = new ArrayList<>();
-        Region holdUnit =  holdOrder.getLocation();
+        Region holdUnit = holdOrder.getLocation();
         List<Region> adjacentRegions = holdUnit.getAdjacentRegions();
 
         // iterate over adjacent regions
         // try to find a region controlled by one of our allies
         // offer him to support our hold order
 
-        for (Region adjacentRegion: adjacentRegions) {
+        for (Region adjacentRegion : adjacentRegions) {
             for (String allyName : alliesRegions.keySet()) {
                 if (alliesRegions.get(allyName).contains(adjacentRegion)) {
 
@@ -344,7 +343,7 @@ public class BackStabDiplomat extends ANACNegotiator {
         return dealsToAdd;
     }
 
-    private List<BasicDeal> addDealsSupportMoveOrders(MTOOrder moveOrder, Map<String, List<Region>> alliesRegions){
+    private List<BasicDeal> addDealsSupportMoveOrders(MTOOrder moveOrder, Map<String, List<Region>> alliesRegions) {
         List<BasicDeal> dealsToAdd = new ArrayList<>();
         Region destinationRegion = moveOrder.getDestination();
 
@@ -355,7 +354,7 @@ public class BackStabDiplomat extends ANACNegotiator {
         // try to find a region controlled by one of our allies
         // offer him to support our move order
 
-        for (Region adjacentRegion: adjacentRegions) {
+        for (Region adjacentRegion : adjacentRegions) {
             for (String allyName : alliesRegions.keySet()) {
                 if (alliesRegions.get(allyName).contains(adjacentRegion)) {
 
@@ -459,13 +458,13 @@ public class BackStabDiplomat extends ANACNegotiator {
         return powersControlledRegions;
     }
 
-    private int getNumSupplyCentersForStrongestPowerBesidesMe(){
+    private int getNumSupplyCentersForStrongestPowerBesidesMe() {
         int maxSupplyCenters = 0;
         List<Power> allPowers = this.game.getPowers();
-        for (Power power : allPowers){
-            if (power != me){
+        for (Power power : allPowers) {
+            if (power != me) {
                 int powerNumSupplyCenters = power.getOwnedSCs().size();
-                if (powerNumSupplyCenters > maxSupplyCenters){
+                if (powerNumSupplyCenters > maxSupplyCenters) {
                     maxSupplyCenters = powerNumSupplyCenters;
                 }
             }
