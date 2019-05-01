@@ -95,7 +95,7 @@ public class BackStabDiplomat extends ANACNegotiator {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
-        if (game.getYear() >= 1915) {
+        if (game.getYear() >= 1910) {
 
             if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
                 this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
@@ -206,9 +206,9 @@ public class BackStabDiplomat extends ANACNegotiator {
             }
 
             // use D-Brane tactics module to get a plan of good orders subjected to current commitments
-            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
-            List<Order> planOrders = tacticPlan.getMyOrders();
-            supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
+//            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
+//            List<Order> planOrders = tacticPlan.getMyOrders();
+//            supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
 
         }
 
@@ -216,9 +216,9 @@ public class BackStabDiplomat extends ANACNegotiator {
             dealsToOffer.addAll(dmzDealsToOffer);
         }
 
-        if (supportHoldAndMoveDealsToOffer.size() > 0){
-            dealsToOffer.addAll(supportHoldAndMoveDealsToOffer);
-        }
+//        if (supportHoldAndMoveDealsToOffer.size() > 0){
+//            dealsToOffer.addAll(supportHoldAndMoveDealsToOffer);
+//        }
 
         return dealsToOffer;
     }
