@@ -30,7 +30,7 @@ public class BackStabDiplomat extends ANACNegotiator {
 
     }
 
-    private int peaceSupplyCenterBoundThreshold = 8;
+    private int peaceSupplyCenterBoundThreshold = 6;
     private String botName;
     private boolean isFirstPeaceRound = true;
     private boolean peaceToAllMode = true;
@@ -95,20 +95,20 @@ public class BackStabDiplomat extends ANACNegotiator {
         boolean startOfThisNegotiation = true;
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
 
-        if (game.getYear() >= 1910) {
-
-            if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
-                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
-                peaceToAllMode = false;
-            }
-
-            if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
-                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
-                peaceToAllMode = true;
-                isFirstPeaceRound = true;
-                coalitionMembers = new ArrayList<>();
-            }
-        }
+//        if (game.getYear() >= 1908) {
+//
+//            if (mySupplyCenterNumber >= peaceSupplyCenterBoundThreshold && peaceToAllMode) {
+//                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to Back-stab mode", true);
+//                peaceToAllMode = false;
+//            }
+//
+//            if (mySupplyCenterNumber < peaceSupplyCenterBoundThreshold && !peaceToAllMode) {
+//                this.getLogger().logln(botName + ":Number of SC for " + me.getName() + " is now " + mySupplyCenterNumber + ". Changing to peace for all mode", true);
+//                peaceToAllMode = true;
+//                isFirstPeaceRound = true;
+//                coalitionMembers = new ArrayList<>();
+//            }
+//        }
 
         //This loop repeats 2 steps. The first step is to handle any incoming messages,
         // while the second step tries to find deals to propose to the other negotiators.
@@ -185,30 +185,30 @@ public class BackStabDiplomat extends ANACNegotiator {
 
     private List<BasicDeal> getDealsToOffer() {
         List<BasicDeal> dealsToOffer = new ArrayList<>();
-        List<BasicDeal> dmzDealsToOffer;
+        List<BasicDeal> dmzDealsToOffer = new ArrayList<>();
         List<BasicDeal> supportHoldAndMoveDealsToOffer = new ArrayList<>();
 
+        List<Power> aliveAllies = getAliveCoalitionMembers();
 
         if (isFirstPeaceRound) {
             List<Power> allPowers = game.getPowers();
             dmzDealsToOffer = getDmzDealsSingleAlly(allPowers);
 
-        } else {
-
-            List<Power> aliveAllies = getAliveCoalitionMembers();
-
-            if (aliveAllies.size() == 1) {
-                dmzDealsToOffer = getDmzDealsSingleAlly(aliveAllies);
-
-            } else {
-
-                dmzDealsToOffer = getDmzDealsMultipleAllies(aliveAllies);
-            }
+//        } else {
+//
+//
+//            if (aliveAllies.size() == 1) {
+//                dmzDealsToOffer = getDmzDealsSingleAlly(aliveAllies);
+//
+//            } else {
+//
+//                dmzDealsToOffer = getDmzDealsMultipleAllies(aliveAllies);
+//            }
 
             // use D-Brane tactics module to get a plan of good orders subjected to current commitments
-//            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
-//            List<Order> planOrders = tacticPlan.getMyOrders();
-//            supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
+            Plan tacticPlan = this.dBraneTactics.determineBestPlan(game, me, this.getConfirmedDeals(), aliveAllies);
+            List<Order> planOrders = tacticPlan.getMyOrders();
+            supportHoldAndMoveDealsToOffer = this.getDealsToSupportHoldAndMoveOrders(planOrders);
 
         }
 
@@ -216,9 +216,9 @@ public class BackStabDiplomat extends ANACNegotiator {
             dealsToOffer.addAll(dmzDealsToOffer);
         }
 
-//        if (supportHoldAndMoveDealsToOffer.size() > 0){
-//            dealsToOffer.addAll(supportHoldAndMoveDealsToOffer);
-//        }
+        if (supportHoldAndMoveDealsToOffer.size() > 0){
+            dealsToOffer.addAll(supportHoldAndMoveDealsToOffer);
+        }
 
         return dealsToOffer;
     }

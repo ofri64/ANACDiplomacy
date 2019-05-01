@@ -19,9 +19,9 @@ public class TournamentRunner {
 //	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1920"};
 //	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1920"};
 
-	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1905"};
+	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1920"};
 	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1920"};
-	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/BackStabDiplomat.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1920"};
+	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1920"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
