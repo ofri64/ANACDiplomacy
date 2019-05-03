@@ -116,7 +116,7 @@ public class RandomBot extends Player{
 		
 		
 		System.out.println("Player " + this.name + " has started and is playing as: " + me.getName());
-
+		
 		//Note: this.name is the name of the player, e.g. 'RandomBot'. On the other hand, me.getName() returns the name
 		// of the Power that this agent is playing, e.g.  'AUS', 'ENG', 'FRA', etcetera. 
 	}
@@ -135,13 +135,7 @@ public class RandomBot extends Player{
 	 */
 	@Override
 	public void start() {
-		// Print the list of all Provinces and a list of regions for each province
-		List<Province> allProvinces = this.game.getProvinces();
-		System.out.println("Following are the possible Provinces:\n" + allProvinces);
-		for (Province p: allProvinces){
-			List<Region> regionsList = p.getRegions();
-			System.out.println("Regions for Province " + p + ":\n" + regionsList);
-		}
+		
 	}
 	
 	/**

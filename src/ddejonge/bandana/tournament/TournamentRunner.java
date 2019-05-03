@@ -9,19 +9,15 @@ import ddejonge.bandana.tools.ProcessRunner;
 import ddejonge.bandana.tools.Logger;
 
 
-
 public class TournamentRunner {
 	
 	//Command lines to start the various agents provided with the Bandana framework.
 	// Add your own line here to run your own bot.
-//	final static String[] randomNegotiatorCommand = {"java", "-jar", "agents/RandomNegotiator.jar", "-log", "log", "-name", "RandomNegotiator", "-fy", "1905"};
-//	final static String[] dumbBot_1_4_Command = {"java", "-jar", "agents/DumbBot-1.4.jar", "-log", "log", "-name", "DumbBot", "-fy", "1905"};
-//	final static String[] dbraneExampleBotCommand = {"java", "-jar", "agents/D-BraneExampleBot.jar", "-log", "log", "-name", "DBraneExampleBot", "-fy", "1920"};
-//	final static String[] anacExampleBotCommand = {"java", "-jar", "agents/AnacExampleNegotiator.jar", "-log", "log", "-name", "AnacExampleNegotiator", "-fy", "1920"};
+	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1925"};
+	final static String[] mycoalitionBotCommand = {"java", "-jar", "agents/CoalitionBot.jar", "-log", "log", "-name", "myCoalitionBot", "-fy", "1925"};
+	final static String[] coalitionBot_v1Command = {"java", "-jar", "agents/CoalitionBot_v1.jar", "-log", "log", "-name", "CoalitionBot_v1", "-fy", "1925"};
+	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1925"};
 
-	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1920"};
-	final static String[] CoallitionBotCommand = {"java", "-jar", "agents/CoallitionBot.jar", "-log", "log", "-name", "CoallitionBot", "-fy", "1920"};
-	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1920"};
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
 	// where the results of the tournament will be logged.
@@ -30,12 +26,12 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 40;				//The number of games this tournament consists of.
+		int numberOfGames = 80;				//The number of games this tournament consists of.
 		
-		int deadlineForMovePhases = 10; 	//30 seconds for each SPR and FAL phases
-		int deadlineForRetreatPhases = 10;  //30 seconds for each SUM and AUT phases
-		int deadlineForBuildPhases = 10;  	//30 seconds for each WIN phase
-
+		int deadlineForMovePhases = 10; 	//10 seconds for each SPR and FAL phases
+		int deadlineForRetreatPhases = 10;  //10 seconds for each SUM and AUT phases
+		int deadlineForBuildPhases = 10;  	//10 seconds for each WIN phase
+		
 		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
 		
@@ -94,40 +90,31 @@ public class TournamentRunner {
 			System.out.println("GAME " + gameNumber);
 			
 			NegoServerRunner.notifyNewGame(gameNumber);
-
+			
 			//4. Start the players:
 			for(int i=0; i<7; i++){
-
+				
 				String name;
 				String[] command;
-
+				
 				//make sure that each player has a different name.
-				if(i<4) {
-					// 4 copies of back stab diplomat bot
+				if(i<3){
+					
+//					name = "D-Brane " + i;
+//					command = dbrane_1_1_Command;
+					name = "CoalitionBot_v1 " + i;
+					command = coalitionBot_v1Command;
 
+				}else{
+					
+//					name = "mycoalitionBot " + i;
+//					command = mycoalitionBotCommand;
+//					name = "CoalitionBot_v1 " + i;
+//					command = coalitionBot_v1Command;
 					name = "BackStabDiplomat " + i;
 					command = BackStabDiplomatCommand;
-//					name = "dbrane_1_1 " + i;
-//					command = dbrane_1_1_Command;
 				}
-
-//				else if (i < 5) {
-//					name = "CoallitionBot " + i;
-//					command = CoallitionBotCommand;
-//				}
-
-				else {
-					// 3 copies of the D-Brane non negotiating bot
-
-//					name = "CoallitionBot " + i;
-//					command = CoallitionBotCommand;
-//					name = "BackStabDiplomat " + i;
-//					command = BackStabDiplomatCommand;
-					name = "d~brane_1_1 " + i;
-					command = dbrane_1_1_Command;
-
-				}
-
+				
 				//set the log folder for this agent to be a subfolder of the tournament log folder.
 				command[4] = tournamentLogFolderPath + File.separator + name + File.separator + "Game " + gameNumber + File.separator; 
 				
@@ -189,7 +176,7 @@ public class TournamentRunner {
 		// you can use this list.
 		ArrayList<GameResult> results = tournamentObserver.getGameResults();
 		
-
+		
 		tournamentObserver.exit();
 		ParlanceRunner.stop();
 		NegoServerRunner.stop();

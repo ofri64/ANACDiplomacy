@@ -12,7 +12,7 @@ import es.csic.iiia.fabregues.dip.board.Power;
 import es.csic.iiia.fabregues.dip.orders.*;
 
 
-public class BackStabDiplomat extends ANACNegotiator {
+public class BackStabDiplomat_v1 extends ANACNegotiator {
     /**
      * Main method to start the agent
      *
@@ -21,7 +21,7 @@ public class BackStabDiplomat extends ANACNegotiator {
 
     public static void main(String[] args) {
 
-        BackStabDiplomat myPlayer = new BackStabDiplomat(args);
+        BackStabDiplomat_v1 myPlayer = new BackStabDiplomat_v1(args);
         myPlayer.run();
 
     }
@@ -41,7 +41,7 @@ public class BackStabDiplomat extends ANACNegotiator {
      *
      * @param args
      */
-    public BackStabDiplomat(String[] args) {
+    public BackStabDiplomat_v1(String[] args) {
         super(args);
         botName = "BackStabDiplomat";
 
