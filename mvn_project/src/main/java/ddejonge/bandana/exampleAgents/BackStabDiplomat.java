@@ -3,6 +3,7 @@ package ddejonge.bandana.exampleAgents;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import ddejonge.bandana.anac.ANACNegotiator;
 import ddejonge.bandana.negoProtocol.*;
@@ -27,11 +28,15 @@ public class BackStabDiplomat extends ANACNegotiator {
     }
 
     private String botName;
-    private boolean backStabMode = false;
+    private boolean totalBackStabMode = false;
+    private boolean backStabStrategyMode = false;
     private boolean isFirstRound = true;
-    private int backStabBeginYear = 1910;
+    private int totalBackStabBeginYear = 1910;
+    private int strategyBackStabBeginYear = 1907;
     private int backStabLowerBoundThreshold = 8;
     private List<Power> coalitionMembers = new ArrayList<>();
+    private List<Power> coalitionCandidates = new ArrayList<>();
+    private Random random = new Random();
 
     //Constructor
 
@@ -88,22 +93,37 @@ public class BackStabDiplomat extends ANACNegotiator {
     @Override
     public void negotiate(long negotiationDeadline) {
         boolean startOfThisNegotiation = true;
+
+        // update coalition members and new candidates
+        if (!this.isFirstRound) {
+            this.removeWeakCoalitionMembers();
+            List<Power> potentialCandidates = this.getNegotiatingPowers();
+            this.coalitionCandidates = this.getCoalitionNewCandidates(potentialCandidates);
+        }
+        this.getLogger().logln(botName + ": My current coalition members are: " + Arrays.toString(coalitionMembers.toArray()), true);
+        this.getLogger().logln(botName + ": My current coalition candidates are: " + Arrays.toString(coalitionCandidates.toArray()), true);
+
+        // check for total back stab mode
         int mySupplyCenterNumber = this.me.getOwnedSCs().size();
         int currentYear = game.getYear();
 
-        if (currentYear >= backStabBeginYear && mySupplyCenterNumber >= backStabLowerBoundThreshold){
-            this.getLogger().logln(botName + ":Number of SC is now " + mySupplyCenterNumber + ". Changing to Back-stab mode for current turn", true);
-            backStabMode = true;
+        if (currentYear >= totalBackStabBeginYear && mySupplyCenterNumber >= backStabLowerBoundThreshold) {
+            this.getLogger().logln(botName + ":Number of SC is now " + mySupplyCenterNumber + ". Changing to total Back-stab mode for current turn", true);
+            totalBackStabMode = true;
         }
 
-        this.getLogger().logln(botName + ": My current allies: " + Arrays.toString(coalitionMembers.toArray()), true);
-
+        // check for strategy back stab mode
+        int maxNumScOutsideCoalition = getNumSupplyCentersForStrongestPowerOutsideCoalition();
+        if (currentYear >= strategyBackStabBeginYear && maxNumScOutsideCoalition < 9){
+            this.getLogger().logln(botName + ":Number of SC is now " + mySupplyCenterNumber + ". Changing to strategy Back-stab mode for current turn", true);
+            backStabStrategyMode = true;
+        }
 
         while (System.currentTimeMillis() < negotiationDeadline) {
 
             if (startOfThisNegotiation) {
 
-                if (!backStabMode) {
+                if (!totalBackStabMode) {
                     this.getLogger().logln(botName + ": " + me.getName() + " now offering deals.", true);
 
                     List<BasicDeal> dealsToOffer = getDealsToOffer();
@@ -123,7 +143,6 @@ public class BackStabDiplomat extends ANACNegotiator {
 
             while (hasMessage()) {
                 Message receivedMessage = removeMessageFromQueue();
-                this.getLogger().logln("got message " + receivedMessage.getContent(), false);
 
                 if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.ACCEPT)) {
                     DiplomacyProposal acceptedProposal = (DiplomacyProposal) receivedMessage.getContent();
@@ -131,12 +150,31 @@ public class BackStabDiplomat extends ANACNegotiator {
 
 
                 } else if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.PROPOSE)) {
-                    if (!backStabMode) {
+                    if (!totalBackStabMode) {
                         DiplomacyProposal receivedProposal = (DiplomacyProposal) receivedMessage.getContent();
                         BasicDeal deal = (BasicDeal) receivedProposal.getProposedDeal();
 
                         if (checkProposedDealIsConsistentAndNotOutDated(deal)) {
-                            this.acceptProposal(receivedProposal.getId());
+                            if (!isFirstRound) {
+                                if (backStabStrategyMode) {
+                                    if (this.acceptProposedDeal(receivedProposal)) {
+                                        this.acceptProposal(receivedProposal.getId());
+
+                                    } else {
+
+                                        this.getLogger().logln("" + botName + ".negotiate() Denied the proposed deal " + receivedMessage.getSender() + ": " + receivedProposal, true);
+                                    }
+                                }
+
+                                else{ // keep accepting proposals
+                                    this.acceptProposal(receivedProposal.getId());
+                                }
+                            }
+
+
+                            else { // first round - just accept
+                                this.acceptProposal(receivedProposal.getId());
+                            }
                         }
                     }
 
@@ -144,12 +182,9 @@ public class BackStabDiplomat extends ANACNegotiator {
                     DiplomacyProposal confirmedProposal = (DiplomacyProposal) receivedMessage.getContent();
                     this.getLogger().logln("" + botName + ".negotiate() Received confirmed from " + receivedMessage.getSender() + ": " + confirmedProposal, false);
 
-                    // This is to make sure this happens only in the first time.
-                    if (isFirstRound) {
-                        List<String> dealParticipants = confirmedProposal.getParticipants();
-                        for (String powerName : dealParticipants) {
-                            addToCoalition(this.game.getPower(powerName));
-                        }
+                    List<String> dealParticipants = confirmedProposal.getParticipants();
+                    for (String powerName : dealParticipants) {
+                        addToCoalition(this.game.getPower(powerName));
                     }
 
                 } else if (receivedMessage.getPerformative().equals(DiplomacyNegoClient.REJECT)) {
@@ -161,7 +196,44 @@ public class BackStabDiplomat extends ANACNegotiator {
             }
         }
         isFirstRound = false;
-        backStabMode = false;
+        totalBackStabMode = false;
+    }
+
+    private boolean acceptProposedDeal(DiplomacyProposal proposal) {
+        double acceptanceThreshold = 1.7;
+
+        List<String> participants = proposal.getParticipants();
+        List<Power> participantsPowers = this.getListOfPowers(participants);
+
+        for (Power participantPower : participantsPowers) {
+            if (!this.isCoalitionMember(participantPower)) {
+                if (!this.isCoalitionCandidate(participantPower)) {
+                    acceptanceThreshold -= 0.3;
+                } else {
+                    acceptanceThreshold -= 0.2;
+                }
+            }
+        }
+
+        double participantsStrength = this.getParticipantsAverageStrength(participantsPowers);
+        double myPower = me.getOwnedSCs().size();
+
+        if (myPower > participantsStrength) {
+            acceptanceThreshold -= 0.4;
+        } else {
+
+            if (participantsStrength <= 5) {
+                acceptanceThreshold -= 0.25;
+
+            } else if (participantsStrength <= 4) {
+                acceptanceThreshold -= 0.2;
+            } else if (participantsStrength <= 3) {
+                acceptanceThreshold -= 0.4;
+            }
+        }
+
+        double acceptanceProbability = this.random.nextDouble();
+        return acceptanceProbability <= acceptanceThreshold; // accept a deal if probability below threshold
     }
 
     private List<BasicDeal> getDealsToOffer() {
@@ -182,11 +254,12 @@ public class BackStabDiplomat extends ANACNegotiator {
 
             } else {
 
-
                 List<BasicDeal> dmzDealsMultipleAllies = getDmzDealsMultipleAllies(aliveAllies);
                 dealsToOffer.addAll(dmzDealsMultipleAllies);
             }
 
+            List<BasicDeal> dmzDealsForCandidates = getDmzDealsSingleAlly(this.coalitionCandidates);
+            dealsToOffer.addAll(dmzDealsForCandidates);
         }
 
         return dealsToOffer;
@@ -250,6 +323,34 @@ public class BackStabDiplomat extends ANACNegotiator {
         }
     }
 
+
+    private boolean isCoalitionMember(Power power) {
+        return this.coalitionMembers.contains(power);
+    }
+
+    private boolean isCoalitionCandidate(Power power) {
+        return this.coalitionCandidates.contains(power);
+    }
+
+    private List<Power> getListOfPowers(List<String> powerNames) {
+        List<Power> powers = new ArrayList<>();
+        for (String powerName : powerNames) {
+            powers.add(this.game.getPower(powerName));
+        }
+
+        return powers;
+    }
+
+    private double getParticipantsAverageStrength(List<Power> participants) {
+        double totalNumSupplyCenters = 0;
+
+        for (Power power : participants) {
+            totalNumSupplyCenters += power.getOwnedSCs().size();
+        }
+
+        return totalNumSupplyCenters / participants.size();
+    }
+
     private List<Power> getAliveCoalitionMembers() {
         List<Power> allAliveNegotiatingPowers = this.getNegotiatingPowers();
         List<Power> aliveCoalitionMembers = new ArrayList<>();
@@ -261,6 +362,87 @@ public class BackStabDiplomat extends ANACNegotiator {
         }
 
         return aliveCoalitionMembers;
+    }
+
+    private void removeWeakCoalitionMembers() {
+        List<Power> aliveCoalitionMembers = this.getAliveCoalitionMembers();
+        List<Power> nextCoalitionMembers = new ArrayList<>();
+
+        for (Power coalitionMember : aliveCoalitionMembers) {
+            double acceptanceThreshold = 0;
+            int memberNumCurrentSupplyCenters = coalitionMember.getOwnedSCs().size();
+
+            switch (memberNumCurrentSupplyCenters) {
+                case 1:
+                    acceptanceThreshold += 0.8;
+                    break;
+                case 2:
+                    acceptanceThreshold += 0.5;
+                    break;
+                case 3:
+                    acceptanceThreshold += 0.3;
+                    break;
+                case 4:
+                    acceptanceThreshold += 0.2;
+                    break;
+                case 5:
+                    acceptanceThreshold += 0.05;
+                    break;
+            }
+
+            double randomProbability = this.random.nextDouble();
+            if (randomProbability <= acceptanceThreshold) {
+                // instead of removing and causing ConcurrentModificationException -
+                // just don't add to new list
+                this.getLogger().logln(botName + ": Removing from coalition " + coalitionMember.getName(), true);
+            }
+            else{
+                nextCoalitionMembers.add(coalitionMember);
+            }
+        }
+
+        this.coalitionMembers = nextCoalitionMembers;
+    }
+
+    private List<Power> getCoalitionNewCandidates(List<Power> candidatePowers) {
+        List<Power> coalitionNewCandidates = new ArrayList<>();
+
+        for (Power candidate : candidatePowers) {
+
+            // skip on current coalition members
+            if (this.isCoalitionMember(candidate) || candidate == me) {
+                continue;
+            }
+
+            double acceptanceThreshold = 0;
+            int myNumOfSupplyCenters = me.getOwnedSCs().size();
+            int candidateNumSupplyCenters = candidate.getOwnedSCs().size();
+
+            if (candidateNumSupplyCenters > myNumOfSupplyCenters) {
+                acceptanceThreshold += 0.8;
+            } else {
+
+                if (candidateNumSupplyCenters >= 8) {
+                    acceptanceThreshold += 0.8;
+                } else if (candidateNumSupplyCenters >= 5) {
+                    acceptanceThreshold += 0.1 * candidateNumSupplyCenters;
+                } else if (candidateNumSupplyCenters >= 3) {
+                    acceptanceThreshold += 0.25;
+                } else {
+                    acceptanceThreshold += 0.1;
+                }
+            }
+
+            // add to new candidates list
+            double acceptProbability = this.random.nextDouble();
+            if (acceptProbability <= acceptanceThreshold) {
+                this.getLogger().logln(botName + ": Adding to new candidates list " + candidate.getName(), true);
+                coalitionNewCandidates.add(candidate);
+            }
+
+        }
+
+        return coalitionNewCandidates;
     }
 
     private boolean checkProposedDealIsConsistentAndNotOutDated(BasicDeal proposedDeal) {
@@ -298,6 +480,21 @@ public class BackStabDiplomat extends ANACNegotiator {
         // the consistency report returns null for consistent deals
 
         return consistencyReport == null;
+    }
+
+    private int getNumSupplyCentersForStrongestPowerOutsideCoalition(){
+        int maxNumSc = 0;
+        List<Power> allPowers = this.game.getPowers();
+        for (Power power : allPowers){
+            if (!this.isCoalitionMember(power)){
+                int powerNumSc = power.getOwnedSCs().size();
+                if (powerNumSc > maxNumSc){
+                    maxNumSc = powerNumSc;
+                }
+            }
+        }
+
+        return maxNumSc;
     }
 
 }

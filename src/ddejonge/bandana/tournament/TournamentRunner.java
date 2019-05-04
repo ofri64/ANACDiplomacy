@@ -14,9 +14,12 @@ public class TournamentRunner {
 	//Command lines to start the various agents provided with the Bandana framework.
 	// Add your own line here to run your own bot.
 	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1925"};
-	final static String[] mycoalitionBotCommand = {"java", "-jar", "agents/CoalitionBot.jar", "-log", "log", "-name", "myCoalitionBot", "-fy", "1925"};
 	final static String[] coalitionBot_v1Command = {"java", "-jar", "agents/CoalitionBot_v1.jar", "-log", "log", "-name", "CoalitionBot_v1", "-fy", "1925"};
 	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1925"};
+	final static String[] GunmaBotCommand = {"java", "-jar", "agents/Gunma.jar", "-log", "log", "-name", "Gunma", "-fy", "1925"};
+	final static String[] MasterMindCommand = {"java", "-jar", "agents/MasterMind.jar", "-log", "log", "-name", "MasterMind", "-fy", "1925"};
+	final static String[] GamlBotCommand = {"java", "-jar", "agents/GamlBot.jar", "-log", "log", "-name", "GamlBot", "-fy", "1925"};
+
 
 
 	//Main folder where all the logs are stored. For each tournament a new folder will be created inside this folder
@@ -98,21 +101,44 @@ public class TournamentRunner {
 				String[] command;
 				
 				//make sure that each player has a different name.
-				if(i<3){
-					
-//					name = "D-Brane " + i;
-//					command = dbrane_1_1_Command;
-					name = "CoalitionBot_v1 " + i;
-					command = coalitionBot_v1Command;
-
-				}else{
-					
-//					name = "mycoalitionBot " + i;
-//					command = mycoalitionBotCommand;
+//				if(i < 1) {
+//
+//					name = "GummaBot " + i;
+//					command = GunmaBotCommand;
+//
+//				} else if (i < 2) {
+//
+//					name = "Gaml " + i;
+//					command = GamlBotCommand;
+//
+//
+//				}else if (i < 3 ){
+//
 //					name = "CoalitionBot_v1 " + i;
 //					command = coalitionBot_v1Command;
+//				} else if ( i < 4 ){
+//					name = "MasterMind " + i;
+//					command = MasterMindCommand;
+//
+//				}
+//				else if (i < 5) {
+//					name = "BackStabDiplomat " + i;
+//					command = BackStabDiplomatCommand;
+//				}
+//
+//				else{
+//					name = "dbrane_1_1 " + i;
+//					command = dbrane_1_1_Command;
+//				}
+
+				if (i < 4) {
 					name = "BackStabDiplomat " + i;
 					command = BackStabDiplomatCommand;
+				}
+
+				else {
+					name = "dbrane_1_1 " + i;
+					command = dbrane_1_1_Command;
 				}
 				
 				//set the log folder for this agent to be a subfolder of the tournament log folder.
