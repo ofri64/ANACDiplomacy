@@ -13,12 +13,12 @@ public class TournamentRunner {
 	
 	//Command lines to start the various agents provided with the Bandana framework.
 	// Add your own line here to run your own bot.
-	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1925"};
-	final static String[] coalitionBot_v1Command = {"java", "-jar", "agents/CoalitionBot_v1.jar", "-log", "log", "-name", "CoalitionBot_v1", "-fy", "1925"};
-	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1925"};
-	final static String[] GunmaBotCommand = {"java", "-jar", "agents/Gunma.jar", "-log", "log", "-name", "Gunma", "-fy", "1925"};
-	final static String[] MasterMindCommand = {"java", "-jar", "agents/MasterMind.jar", "-log", "log", "-name", "MasterMind", "-fy", "1925"};
-	final static String[] GamlBotCommand = {"java", "-jar", "agents/GamlBot.jar", "-log", "log", "-name", "GamlBot", "-fy", "1925"};
+	final static String[] dbrane_1_1_Command = {"java", "-jar", "agents/D-Brane-1.1.jar", "-log", "log", "-name", "D-Brane", "-fy", "1920"};
+	final static String[] coalitionBot_v1Command = {"java", "-jar", "agents/CoalitionBot_v1.jar", "-log", "log", "-name", "CoalitionBot_v1", "-fy", "1920"};
+	final static String[] BackStabDiplomatCommand = {"java", "-jar", "mvn_project/target/nego_bot-1-jar-with-dependencies.jar", "-log", "log", "-name", "BackStabDiplomat", "-fy", "1920"};
+	final static String[] GunmaBotCommand = {"java", "-jar", "agents/Gunma.jar", "-log", "log", "-name", "Gunma", "-fy", "1920"};
+	final static String[] MasterMindCommand = {"java", "-jar", "agents/MasterMind.jar", "-log", "log", "-name", "MasterMind", "-fy", "1920"};
+	final static String[] GamlBotCommand = {"java", "-jar", "agents/GamlBot.jar", "-log", "log", "-name", "GamlBot", "-fy", "1920"};
 
 
 
@@ -29,11 +29,11 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) throws IOException {
 		
-		int numberOfGames = 80;				//The number of games this tournament consists of.
+		int numberOfGames = 100;				//The number of games this tournament consists of.
 		
-		int deadlineForMovePhases = 10; 	//10 seconds for each SPR and FAL phases
-		int deadlineForRetreatPhases = 10;  //10 seconds for each SUM and AUT phases
-		int deadlineForBuildPhases = 10;  	//10 seconds for each WIN phase
+		int deadlineForMovePhases = 20; 	//10 seconds for each SPR and FAL phases
+		int deadlineForRetreatPhases = 20;  //10 seconds for each SUM and AUT phases
+		int deadlineForBuildPhases = 20;  	//10 seconds for each WIN phase
 		
 		int finalYear = 1920; 	//The year after which the agents in each game are supposed to propose a draw to each other.
 		// (It depends on the implementation of the players whether this will indeed happen or not, so this may not always work.) 
